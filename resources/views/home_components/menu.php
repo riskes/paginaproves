@@ -47,10 +47,11 @@ body{
 }
 
 </style>
+
 <div class='content'>
 <div class='flexnavmenu'>
 
-<a class='botomenu centrat' href="{{route('calendar')}}"><div >opció1</div></a>
+<div  class='botomenu centrat' ><a href="{{ route('calendari') }}">opció1</a></div>
 <a></a><div class='botomenu centrat' href=''>opció2</div>
 <a></a><div class='botomenu centrat' href=''>opció3</div>
 <a></a><div class='botomenu centrat' href=''>opció4</div>

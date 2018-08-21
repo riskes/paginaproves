@@ -12,5 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('home');
+    return view('welcome');
 });
+
+route::get('calendari', ['as' => 'calendari', 'uses' => 'CalendarisController@index']);
