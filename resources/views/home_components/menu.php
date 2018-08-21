@@ -50,10 +50,10 @@ body{
 <div class='content'>
 <div class='flexnavmenu'>
 
-<div class='botomenu centrat' href=''>opció1</div>
-<div class='botomenu centrat' href=''>opció2</div>
-<div class='botomenu centrat' href=''>opció3</div>
-<div class='botomenu centrat' href=''>opció4</div>
+<a class='botomenu centrat' href="{{route('calendar')}}"><div >opció1</div></a>
+<a></a><div class='botomenu centrat' href=''>opció2</div>
+<a></a><div class='botomenu centrat' href=''>opció3</div>
+<a></a><div class='botomenu centrat' href=''>opció4</div>
 
 </div>
 </div>
