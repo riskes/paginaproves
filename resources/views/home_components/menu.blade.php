@@ -5,7 +5,7 @@ body{
 }
 .content{
     display: flex;
-    position: fixed;
+    position: block;
     width: 100vw;
     height: 10vh;
     margin-top: 5px;
@@ -13,7 +13,7 @@ body{
 }
 .flexnavmenu{
     display: flex;
-    position: fixed;
+    position: block;
     width: 80vw;
     height: 10vh;
     justify-content:center;
