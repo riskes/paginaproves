@@ -1,5 +1,5 @@
 /* =========================================================
- * Bootstrap year calendar v1.0.1
+ * Bootstrap year calendar v1.1.0
  * Repo: https://github.com/Paul-DS/bootstrap-year-calendar
  * =========================================================
  * Created by Paul David-Sivelle
@@ -144,6 +144,18 @@
 	font-weight:bold;
 	border-right:1px solid #eee;
 	padding:5px;
+}
+
+.calendar .round-left {
+	-webkit-border-radius: 8px 0 0 8px;
+	-moz-border-radius: 8px 0 0 8px;
+	border-radius: 8px 0 0 8px;
+}
+
+.calendar .round-right {
+	webkit-border-radius: 0 8px 8px 0 ;
+	-moz-border-radius: 0 8px 8px 0;
+	border-radius: 0 8px 8px 0;
 }
 
 .calendar table.month tr td .day-content {

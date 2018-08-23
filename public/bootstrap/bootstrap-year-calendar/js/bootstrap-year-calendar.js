@@ -1,5 +1,5 @@
 /* =========================================================
- * Bootstrap year calendar v1.0.1
+ * Bootstrap year calendar v1.1.0
  * Repo: https://github.com/Paul-DS/bootstrap-year-calendar
  * =========================================================
  * Created by Paul David-Sivelle
@@ -41,12 +41,16 @@
 				language: (opt.language != null && dates[opt.language] != null) ? opt.language : 'en',
 				allowOverlap: opt.allowOverlap != null ? opt.allowOverlap : true,
 				displayWeekNumber: opt.displayWeekNumber != null ? opt.displayWeekNumber : false,
+				alwaysHalfDay: opt.alwaysHalfDay != null ? opt.alwaysHalfDay : false,
 				enableRangeSelection: opt.enableRangeSelection != null ? opt.enableRangeSelection : false,
 				disabledDays: opt.disabledDays instanceof Array ? opt.disabledDays : [],
+				roundRangeLimits: opt.roundRangeLimits != null ? opt.roundRangeLimits : false,
 				dataSource: opt.dataSource instanceof Array != null ? opt.dataSource : [],
-				style: opt.style == 'background' ? 'background' : 'border',
+				style: opt.style == 'background' || opt.style == 'border' || opt.style == 'custom' ? opt.style : 'border',
 				enableContextMenu: opt.enableContextMenu != null ? opt.enableContextMenu : false,
-				contextMenuItems: opt.contextMenuItems instanceof Array ? opt.contextMenuItems : []
+				contextMenuItems: opt.contextMenuItems instanceof Array ? opt.contextMenuItems : [],
+				customDayRenderer : $.isFunction(opt.customDayRenderer) ? opt.customDayRenderer : null,
+				customDataSourceRenderer : $.isFunction(opt.customDataSourceRenderer) ? opt.customDataSourceRenderer : null
 			};
 			
 			this._initializeDatasourceColors();
@@ -57,7 +61,6 @@
 			}
 		
 			if(opt.renderEnd) { this.element.bind('renderEnd', opt.renderEnd); }
-			if(opt.renderDay) { this.element.bind('renderDay', opt.renderDay); }
 			if(opt.clickDay) { this.element.bind('clickDay', opt.clickDay); }
 			if(opt.dayContextMenu) { this.element.bind('dayContextMenu', opt.dayContextMenu); }
 			if(opt.selectRange) { this.element.bind('selectRange', opt.selectRange); }
@@ -200,7 +203,7 @@
 				if(this.options.displayWeekNumber) {
 					var weekNumberCell = $(document.createElement('th'));
 					weekNumberCell.addClass('week-number');
-					weekNumberCell.text('W')
+					weekNumberCell.text(dates[this.options.language].weekShort);
 					headerRow.append(weekNumberCell);
 				}
 				
@@ -273,6 +276,10 @@
 							cellContent.addClass('day-content');
 							cellContent.text(currentDate.getDate());
 							cell.append(cellContent);
+							
+							if(this.options.customDayRenderer) {
+								this.options.customDayRenderer(cellContent, currentDate);
+							}
 						}
 						
 						row.append(cell);
@@ -326,7 +333,7 @@
 									
 									if(dayData.length > 0)
 									{
-										_this._renderDataSourceDay($(this), dayData);
+										_this._renderDataSourceDay($(this), currentDate, dayData);
 									}
 								}
 							});
@@ -335,7 +342,7 @@
 				});
 			}
 		},
-		_renderDataSourceDay: function(elt, events) {
+		_renderDataSourceDay: function(elt, currentDate, events) {
 			switch(this.options.style)
 			{
 				case 'border':
@@ -370,6 +377,59 @@
 			
 				case 'background':
 					elt.parent().css('background-color', events[events.length - 1].color);
+					
+					var currentTime = currentDate.getTime();
+					
+					if(events[events.length - 1].startDate.getTime() == currentTime)
+					{
+						elt.parent().addClass('day-start');
+						
+						if(events[events.length - 1].startHalfDay || this.options.alwaysHalfDay) {
+							elt.parent().addClass('day-half');
+							
+							// Find color for other half
+							var otherColor = 'transparent';
+							for(var i = events.length - 2; i >= 0; i--) {
+								if(events[i].startDate.getTime() != currentTime || (!events[i].startHalfDay && !this.options.alwaysHalfDay)) {
+									otherColor = events[i].color;
+									break;
+								}
+							}
+							
+							elt.parent().css('background', 'linear-gradient(-45deg, ' + events[events.length - 1].color + ', ' + events[events.length - 1].color + ' 49%, ' + otherColor + ' 51%, ' + otherColor + ')');
+						}
+						else if(this.options.roundRangeLimits) {
+							elt.parent().addClass('round-left');
+						}
+					}
+					else if(events[events.length - 1].endDate.getTime() == currentTime)
+					{
+						elt.parent().addClass('day-end');
+						
+						if(events[events.length - 1].endHalfDay || this.options.alwaysHalfDay) {
+							elt.parent().addClass('day-half');
+							
+							// Find color for other half
+							var otherColor = 'transparent';
+							for(var i = events.length - 2; i >= 0; i--) {
+								if(events[i].endDate.getTime() != currentTime || (!events[i].endHalfDay &&  !this.options.alwaysHalfDay)) {
+									otherColor = events[i].color;
+									break;
+								}
+							}
+							
+							elt.parent().css('background', 'linear-gradient(135deg, ' + events[events.length - 1].color + ', ' + events[events.length - 1].color + ' 49%, ' + otherColor + ' 51%, ' + otherColor + ')');
+						}
+						else if(this.options.roundRangeLimits) {
+							elt.parent().addClass('round-right');
+						}
+					}
+					break;
+					
+				case 'custom':
+					if(this.options.customDataSourceRenderer) {
+						this.options.customDataSourceRenderer.call(this, elt, currentDate, events);
+					}
 					break;
 			}
 		},
@@ -404,17 +464,6 @@
 			});
 			
 			var cells = this.element.find('.day:not(.old, .new, .disabled)');
-			
-			/* Day rendering */
-			this.element.find('.month-container').each(function() {
-				var month = $(this).data('month-id');
-				$(this).find('.day-content').each(function() {
-					_this._triggerEvent('renderDay', {
-						element: $(this),
-						date: new Date(_this.options.startYear, month, $(this).text())
-					});
-				});
-			});
 			
 			/* Click on date */
 			cells.click(function(e) {
@@ -765,7 +814,7 @@
 			return this.options.style;
 		},
 		setStyle: function(style) {
-			this.options.style = style == 'background' ? 'background' : 'border';
+			this.options.style = style == 'background' || style == 'border' || style == 'custom' ? style : 'border';
 			this._render();
 		},
 		getAllowOverlap: function() {
@@ -779,6 +828,13 @@
 		},
 		setDisplayWeekNumber: function(displayWeekNumber) {
 			this.options.displayWeekNumber = displayWeekNumber;
+			this._render();
+		},
+		getAlwaysHalfDay: function() {
+			return this.options.alwaysHalfDay;
+		},
+		setAlwaysHalfDay: function(alwaysHalfDay) {
+			this.options.alwaysHalfDay = alwaysHalfDay;
 			this._render();
 		},
 		getEnableRangeSelection: function() {
@@ -795,6 +851,13 @@
 			this.options.disabledDays = disabledDays instanceof Array ? disabledDays : [];
 			this._render();
 		},
+		getRoundRangeLimits: function() {
+			return this.options.roundRangeLimits;
+		},
+		setRoundRangeLimits: function(roundRangeLimits) {
+			this.options.roundRangeLimits = roundRangeLimits;
+			this._render();
+		},
 		getEnableContextMenu: function() {
 			return this.options.enableContextMenu;
 		},
@@ -807,6 +870,20 @@
 		},
 		setContextMenuItems: function(contextMenuItems) {
 			this.options.contextMenuItems = contextMenuItems instanceof Array ? contextMenuItems : [];
+			this._render();
+		},
+		getCustomDayRenderer: function() {
+			return this.options.customDayRenderer;
+		},
+		setCustomDayRenderer: function(customDayRenderer) {
+			this.options.customDayRenderer = $.isFunction(customDayRenderer) ? customDayRenderer : null;
+			this._render();
+		},
+		getCustomDataSourceRenderer: function() {
+			return this.options.customDataSourceRenderer;
+		},
+		setCustomDataSourceRenderer: function(customDataSourceRenderer) {
+			this.options.customDataSourceRenderer = $.isFunction(customDataSourceRenderer) ? customDataSourceRenderer : null;
 			this._render();
 		},
 		getLanguage: function() {
@@ -835,11 +912,11 @@
 	$.fn.calendar = function (options) {
 		var calendar = new Calendar($(this) ,options);
 		$(this).data('calendar', calendar);
+		return calendar;
 	}
 	
 	/* Events binding management */
 	$.fn.renderEnd = function(fct) { $(this).bind('renderEnd', fct); }
-	$.fn.renderDay = function(fct) { $(this).bind('renderDay', fct); }
 	$.fn.clickDay = function(fct) { $(this).bind('clickDay', fct); }
 	$.fn.dayContextMenu = function(fct) { $(this).bind('dayContextMenu', fct); }
 	$.fn.selectRange = function(fct) { $(this).bind('selectRange', fct); }
@@ -853,6 +930,7 @@
 			daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
 			months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 			monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			weekShort: 'W',
 			weekStart:0
 		}
 	};
