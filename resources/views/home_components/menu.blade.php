@@ -49,7 +49,7 @@ body{
 </style>
 
 <div class='content'>
-<div class='flexnavmenu'>
+<div class='flexnavmenu --red'>
 
 <div  class='botomenu centrat' ><a href="{{ route('calendari') }}">opció1</a></div>
 <a></a><div class='botomenu centrat' href=''>opció2</div>
