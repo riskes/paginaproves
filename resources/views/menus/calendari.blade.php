@@ -20,7 +20,7 @@
     
     <script>
     function editEvent(event) {
-   console.log("hola"); 
+   console.log("hola");  
 }
 
 function deleteEvent(event) {
