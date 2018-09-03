@@ -20,7 +20,26 @@
     
     <script>
     function editEvent(event) {
-   console.log("hola");  
+        var dialog = bootbox.dialog({
+        title: 'A custom dialog with buttons and callbacks',
+        message: $("#modal").html(),
+        buttons: {
+            cancel: {
+                label: "I'm a custom cancel button!",
+                className: 'btn-danger',
+                callback: function(){
+                    Example.show('Custom cancel clicked');
+                }
+            },
+            ok: {
+                label: "I'm a custom OK button!",
+                className: 'btn-info',
+                callback: function(){
+                    Example.show('Custom OK clicked');
+                }
+            }
+        }
+        });
 }
 
 function deleteEvent(event) {
@@ -57,6 +76,7 @@ $(function() {
     });
 });
     </script>
+    @include("includes.modalCalendar")
 </html>
 
 
