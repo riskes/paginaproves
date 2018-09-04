@@ -1,2 +1,1 @@
-
-<div>hola</div>
+<div id="modal">holassa</div>
