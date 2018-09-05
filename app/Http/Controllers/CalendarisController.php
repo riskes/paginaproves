@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Calendari;
+use Barryvdh\Debugbar\Facade as Debugbar;
 
 class CalendarisController extends Controller
 {
@@ -34,7 +36,11 @@ class CalendarisController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $data = $request->all();
+        Debugbar::info($data);
+        Calendari::create($data);
+        
     }
 
     /**

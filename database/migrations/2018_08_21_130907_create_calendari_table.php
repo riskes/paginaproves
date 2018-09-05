@@ -14,10 +14,8 @@ class CreateCalendariTable extends Migration
     public function up()
     {
         Schema::create('calendari', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('userid');
-            $table->date('dataini');
-            $table->date('datafi');
+            $table->string('dataini');
+            $table->string('datafi');
             $table->string('color');
             $table->timestamps();
         });

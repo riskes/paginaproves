@@ -19,3 +19,5 @@ route::get('calendari', ['as' => 'calendari', 'uses' => 'CalendarisController@in
 Route::get('modalcalendar', function () {
     return view('menus.includes.modalCalendar');
 });
+
+Route::post("calendaris/store", "CalendarisController@store");

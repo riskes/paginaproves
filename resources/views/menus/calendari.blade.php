@@ -2,6 +2,7 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}">
     <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
         <link href="{{ asset('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('bootstrap/datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet" type="text/css" >
         <link href="{{ asset('bootstrap/bootstrap-year-calendar/css/bootstrap-year-calendar.css') }}" rel="stylesheet" type="text/css">
@@ -21,8 +22,8 @@
     <!-- @include('menus.includes.modalCalendar') -->
     <script>
     function editEvent(event) {
-       
-
+        console.log(event);
+    var date = ""+event.date.getDate()+"/"+(event.date.getMonth()+1)+"/"+event.date.getFullYear()+"";
     $.ajax({
         type: "GET",
         url: 'modalcalendar',
@@ -34,6 +35,9 @@
                     success: {
                         label: "Success!",
                         className: "btn-success",
+                        callback: function(){
+                            saveEvent(date);
+                        }
                     },
                 }
             });
@@ -45,8 +49,26 @@ function deleteEvent(event) {
  
 }
 
-function saveEvent() {
-  
+function saveEvent(date) {
+    var datafi = date;
+    var dataini = date;
+    var color = "red";
+    $.ajax({
+        type: "POST",
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        url: "calendaris/store",
+        data: {dataini: dataini, datafi: datafi, color: color},
+        datatype: "json",
+        success: function(){
+            console.log("ok");
+        },
+        error: function(){
+            console.log("error");
+        }
+    });
+    
 }
 
 $(function() {
